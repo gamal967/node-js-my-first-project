@@ -1,0 +1,22 @@
+
+extends layouts/main-layout.pug
+block style 
+    link(rel="stylesheet", href="/css/shop.css")
+block content
+                        
+        main 
+            if prods.length > 0
+                div.grid
+                    each product in prods
+                        article.card.product-item
+                            header.card__header
+                                h1.product_title #{product.title}
+                            div.card_image
+                                img(src="https://img.freepik.com/free-photo/book-composition-with-open-book_23-2147690555.jpg", alt="A Book")
+                            div.card__content
+                                h2.product-price $19.99
+                                p.product_description A very good book
+                            div.card_actions 
+                                button.btn Add to Cart
+            else
+                h1 No Product Found

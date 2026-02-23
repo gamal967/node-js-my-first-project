@@ -1,0 +1,23 @@
+{
+  "name": "frist-app",
+  "version": "1.0.0",
+  "description": "node.js project",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js",
+    "start-server": "node server.js"
+  },
+  "author": "Gamal",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  },
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
+    "express-handlebars": "3.0",
+    "pug": "^3.0.3"
+  }
+}
