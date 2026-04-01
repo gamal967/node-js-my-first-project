@@ -1,5 +1,5 @@
 
-extends layouts/main-layout.pug
+extends ../layouts/main-layout.pug
 block style 
     link(rel="stylesheet", href="/css/shop.css")
 block content
@@ -12,11 +12,13 @@ block content
                             header.card__header
                                 h1.product_title #{product.title}
                             div.card_image
-                                img(src="https://img.freepik.com/free-photo/book-composition-with-open-book_23-2147690555.jpg", alt="A Book")
+                                img(src=product.imageUrl, alt=product.title)
                             div.card__content
-                                h2.product-price $19.99
-                                p.product_description A very good book
+                                h2.product-price $#{product.price}
+                                p.product_description #{product.description}
                             div.card_actions 
-                                button.btn Add to Cart
+                                form(action="/cart", method="post").form-btn
+                                    button(type="submit").btn Add to Cart
+                                    input(type="hidden" name="productId" value=product.id)
             else
                 h1 No Product Found

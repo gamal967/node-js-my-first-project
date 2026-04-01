@@ -8,6 +8,11 @@
     "start": "nodemon app.js",
     "start-server": "node server.js"
   },
+  "nodemonConfig": {
+    "ignore": [
+      "data/*.json"
+    ]
+  },
   "author": "Gamal",
   "license": "ISC",
   "devDependencies": {

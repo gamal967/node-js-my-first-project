@@ -1,0 +1,19 @@
+extends ../layouts/main-layout.pug
+block style 
+    link(rel="stylesheet", href="/css/shop.css")
+    link(rel="stylesheet", href="/css/product-detail.css")
+block content
+    div.product-detail-container
+        div.product-detail-header
+            h1 Product Detail
+        div.product-detail-content
+            div.product-image-container
+                img(src=product.imageUrl, alt=product.title).main-image
+            div.product-info
+                h2.title #{product.title}
+                p.description #{product.description}
+                p.price $#{product.price}
+                p.sale 20% off $#{product.price * 0.8}
+                form(action="/cart", method="post").form-btn
+                    button(type="submit").btn Add to Cart
+                    input(type="hidden" name="productId" value=product.id)

@@ -1,0 +1,42 @@
+
+extends ../layouts/main-layout.pug
+
+block content 
+    main.main-content 
+        form(action=`${editing ? '/admin/edit-product' : '/admin/product'}`, method="POST", id="add-product-form").product-form
+            if editing
+                input(type="hidden", name="productId", value=""+product.id)            
+            label(for="title") Product Name
+            input.input(type="text", name="title", id="title", placeholder="Product name" value=editing ? product.title : '')
+
+            label(for="imageUrl") Product Image
+            input.input(type="text", name="imageUrl", id="imageUrl", placeholder="Product image URL" value=editing ? product.imageUrl : '')
+
+            label(for="price") Price
+            input.input(type="number", name="price", id="price", placeholder="Product price", step="0.01" value=editing ? product.price : '')
+
+            label(for="description") Description
+            textarea.input(name="description" ,id="description",rows="3" cols="50" placeholder="Product description" ) #{editing ? product.description : ''}
+            button.submit(type="submit") #{editing ? 'Update Product' : 'Add Product'}
+        //-     p#error-msg
+
+        //- script.
+        //-     (function(){
+        //-         var form = document.getElementById('add-product-form');
+        //-         var input = document.getElementById('title');
+        //-         var err = document.getElementById('error-msg');
+        //-         if(!form) return;
+        //-         form.addEventListener('submit', function(e){
+        //-             if(!input.value || input.value.trim() === ''){
+        //-                 e.preventDefault();
+        //-                 err.textContent = 'Please write a product name.';
+        //-                 err.style.color = 'red';
+        //-                 input.focus();
+        //-             } else {
+        //-                 err.textContent = '';
+        //-             }
+        //-         });
+        //-         input.addEventListener('input', function(){
+        //-             if(input.value && input.value.trim() !== '') err.textContent = '';
+        //-         });
+        //-     })();

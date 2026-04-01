@@ -227,6 +227,7 @@ main > h1 {
 /* ── Card actions ── */
 .card_actions {
   padding: 0 1.4rem 1.4rem;
+  
 }
 
 .btn {
@@ -245,6 +246,7 @@ main > h1 {
   overflow: hidden;
   transition: transform 0.2s, box-shadow 0.3s;
   box-shadow: 0 4px 18px rgba(108, 63, 197, 0.4);
+  margin-top: 10px;
 }
 
 .btn::after {
