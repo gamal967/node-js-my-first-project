@@ -1,16 +1,27 @@
 extends ../layouts/main-layout.pug
+block style 
+    link(rel="stylesheet", href="/css/cart.css")
 block content 
-    main.main-content 
-        h1 Cart
-        if products.length > 0
-            ul
-                each p in products
-                    li 
-                        p #{ p.productData.title || 'No Title'} - Quantity: #{p.qty || 0}
-                        form(action="/cart-delete-item", method="POST").form-btn
-                            button(type="submit").btn Remove
-                                input(type="hidden", name="productId", value=p.productData.id)
-                
-        else
-            p Your cart is empty.
-        
+    main.main-content
+        div.cart-container
+            h1.cart-title Your Cart
+
+            if products.length > 0
+                ul.cart-list
+                    each p in products
+                        li.cart-item
+                            div.cart-item__info
+                                span.cart-item__title #{p.title || 'No Title'}
+                                span.cart-item__qty Quantity: #{p.cartItem.quantity || 0}
+                            form(action="/cart-delete-item", method="POST")
+                                input(type="hidden", name="productId", value=p.id)
+                                button.cart-item__remove(type="submit") Remove
+                form(action="/create-order", method="POST")
+                    button.order(type="submit") Order Now!
+
+                div.cart-total
+                    span.cart-total__label Tota
+                    span.cart-total__price $#{products.reduce((sum, p) => sum + (p.price * p.cartItem.quantity), 0).toFixed(2)}
+
+            else
+                p.cart-empty 🛒 Your cart is empty.

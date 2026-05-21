@@ -1,0 +1,92 @@
+/* ── Admin Page Styles ── */
+
+/* ── Admin Actions ── */
+.admin-actions {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0 1.4rem 1.4rem;
+  flex-wrap: wrap;
+}
+
+.btn-edit {
+  flex: 1;
+  background: linear-gradient(135deg, #2d6a4f 0%, #52b788 100%) !important;
+  box-shadow: 0 4px 18px rgba(45, 106, 79, 0.4) !important;
+}
+
+.btn-edit:hover {
+  box-shadow: 0 8px 28px rgba(82, 183, 136, 0.5) !important;
+}
+
+.btn-delete {
+  flex: 1;
+  background: linear-gradient(135deg, #7b2d2d 0%, #e05252 100%) !important;
+  box-shadow: 0 4px 18px rgba(123, 45, 45, 0.4) !important;
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 0.75rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.3s;
+  width: 100%;
+}
+
+.btn-delete::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+}
+
+.btn-delete:hover::after { transform: translateX(100%); }
+.btn-delete:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(224, 82, 82, 0.5) !important;
+}
+.btn-delete:active { transform: translateY(0); }
+
+/* ── Delete form ── */
+.delete-form {
+  flex: 1;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  min-width: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  gap: 0 !important;
+  border-radius: 0 !important;
+}
+
+.delete-form::before {
+  display: none !important;
+}
+
+/* ── Empty State ── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  min-height: 40vh;
+  color: rgba(220, 190, 255, 0.45);
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+}
+
+.empty-state .btn {
+  width: auto;
+  padding: 0.75rem 2rem;
+  text-decoration: none;
+  display: inline-block;
+}

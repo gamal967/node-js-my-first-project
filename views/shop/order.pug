@@ -2,5 +2,22 @@
 extends ../layouts/main-layout.pug
 block style 
     link(rel="stylesheet", href="/css/shop.css")
+    link(rel="stylesheet", href="/css/orders.css")
 block content
-    h1 Your Orders
+    main
+        if orders.length == 0
+            h1.no-orders No Orders Yet
+        else
+            div.orders-container
+                h1.orders-title Your Orders
+                ul.orders-list
+                    each order in orders
+                        li.order-item.card
+                            header.order-header
+                                h2.order-id Order ##{order.id}
+                            div.order-content
+                                ul.products-list
+                                    each product in order.products
+                                        li.product-item
+                                            span.product-title #{product.title}
+                                            span.product-quantity x#{product.orderItem.quantity}

@@ -1,6 +1,10 @@
 
 extends ../layouts/main-layout.pug
 
+block style 
+    link(rel="stylesheet", href="/css/shop.css")
+    link(rel="stylesheet", href="/css/admin.css")
+
 block content 
     main.main-content 
         form(action=`${editing ? '/admin/edit-product' : '/admin/product'}`, method="POST", id="add-product-form").product-form
