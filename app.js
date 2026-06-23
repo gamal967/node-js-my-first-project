@@ -1,14 +1,14 @@
 
-require('dotenv').config();
-
 const rootDir =require('./util/path');
 const path =require('path');
 const express =require('express');
 const app = express();
 const bodyParser =require('body-parser');   
-// const adminRoutes =require('./routes/admin'); 
-// const shopRoute =require('./routes/shop');
-const mongoConnect =require('./util/DB');
+const errorController=require('./controllers/error');
+const adminRoutes =require('./routes/admin'); 
+const shopRoute =require('./routes/shop');  
+const mongoConnect =require('./util/DB').mongoConnect;
+const User =require('./models/user');
 
 
 
@@ -23,24 +23,22 @@ app.use(bodyParser.urlencoded({extended:false}));
 app.use(express.static(path.join(rootDir,'public')));
 
 app.use((req,res,next)=>{
-    // User.findByPk(1)
-    // .then(user=>{
-    //     console.log(user);
-    //     req.user = user;
-    //     next();
-    // })
-    // .catch(err=>console.log(err));
+    User.findById('6a1c347d6bcf83794bb68bc6')
+    .then(user=>{
+        req.user = new User(user._id, user.userName, user.email, user.cart);
+        next();
+    })
+    .catch(err=>console.log(err));
+    
 });
 
-// app.use('/admin',adminRoutes);
-// app.use(shopRoute);
+app.use('/admin',adminRoutes);
+app.use(shopRoute);
 
-const errorController=require('./controllers/error');
 app.use(errorController.get404);
 
 
-mongoConnect(client=>{
-    console.log(client);
+mongoConnect(()=>{
     app.listen(3000);
 });
 

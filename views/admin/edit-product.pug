@@ -18,7 +18,7 @@ block content
             label(for="description") Description
             textarea.input(name="description" ,id="description",rows="3" cols="50" placeholder="Product description" ) #{editing ? product.description : ''}
             if editing
-                input(type="hidden", name="productId", value=""+product.id) 
+                input(type="hidden", name="productId", value=""+product._id) 
             button.submit(type="submit") #{editing ? 'Update Product' : 'Add Product'}
         //-     p#error-msg
 

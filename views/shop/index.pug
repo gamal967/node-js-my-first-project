@@ -19,6 +19,6 @@ block content
                             div.card_actions 
                                 form(action="/cart", method="post").form-btn
                                     button(type="submit").btn Add to Cart
-                                    input(type="hidden" name="productId" value=product.id)
+                                    input(type="hidden" name="productId" value=product._id)
             else
                 h1 No Product Found

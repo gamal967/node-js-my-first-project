@@ -1,5 +1,7 @@
-const { where } = require('sequelize');
+
 const Product = require('../models/product');
+
+
 
 
 exports.getAddProduct = (req, res, next) => {
@@ -18,16 +20,12 @@ exports.postAddProduct=(req,res,next)=>{
     const imageUrl=req.body.imageUrl;
     const price=req.body.price;
     const description=req.body.description;
-    req.user.createProduct({
-        title:title,
-        imageUrl:imageUrl,
-        price:price,
-        description:description
-    })
-    .then(result=>{
+    const product =new Product(title, imageUrl, description, price,null,req.user._id);
+    product.save()
+    .then(()=>{
         // console.log(result);
         console.log('Created Product');
-        res.redirect('/admin/products');
+        res.redirect('/');
         
         
     })
@@ -40,11 +38,11 @@ exports.getEditProduct=(req, res, next) => {
         
     }
     const prodId = req.params.productId;
-    req.user.getProducts({where: {id: prodId}})
+    // req.user.getProducts({where: {id: prodId}})
+    // console.log(prodId);
     
-    // Product.findOne({where: {id: prodId}})
-    .then(results=>{
-        const result=results[0];
+    Product.findById(prodId)
+    .then(result=>{
         if (!result) {
             return res.redirect('/');
         }
@@ -63,17 +61,22 @@ exports.postEditProduct=(req, res, next) => {
     const prodId=req.body.productId;
     const updatedTitle=req.body.title;
     const updatedImageUrl=req.body.imageUrl;
-    const updatedPrice=req.body.price;
     const updatedDescription=req.body.description;
-    Product.update(
-        {
-            title: updatedTitle,
-            imageUrl: updatedImageUrl,
-            price: updatedPrice,
-            description: updatedDescription
-        },
-        {where: {id: prodId}}
-    ).then(result=>{
+    const updatedPrice=req.body.price;
+    // console.log(prodId);    
+
+    const product =new Product(
+        updatedTitle, 
+        updatedImageUrl, 
+        updatedDescription, 
+        updatedPrice,
+        prodId
+    );
+
+
+    product
+    .save()
+    .then(()=>{
         console.log('Updated Product');
         res.redirect('/admin/products');
     })
@@ -81,8 +84,8 @@ exports.postEditProduct=(req, res, next) => {
 }
 
 exports.getProducts=(req, res, next) => {
-    req.user.getProducts()
-    // Product.findAll()
+    // req.user.getProducts()
+    Product.fetchAll()
     .then(result=>{
         res.render('admin/products', {
         prods: result,
@@ -98,9 +101,9 @@ exports.getProducts=(req, res, next) => {
 // Delete product
 exports.postDeleteProduct=(req, res, next) => {
     const prodId=req.body.productId;
-    // req.user.destroy({where: {id: prodId}})
-    Product.destroy({where: {id: prodId}})
-    .then(result=>{
+    // req.user.destroy({where: {id: prodId}}) with MySQL
+    Product.deleteById(prodId) // with MongoDB
+    .then(()=>{
         console.log('Deleted Product');
         res.redirect('/admin/products');
     })
