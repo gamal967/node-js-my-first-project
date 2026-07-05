@@ -9,10 +9,10 @@ const adminController =require('../controllers/admin');
 // /admin/add-product => GET
 router.get('/add-product',adminController.getAddProduct); 
 
-// /admin/add-product => GETX
+// // /admin/products => GETX
 router.get('/products',adminController.getProducts);
 
-// /admin/product => POST
+// // /admin/product => POST
 router.post('/product',adminController.postAddProduct);
 
 router.get('/edit-product/:productId',adminController.getEditProduct);

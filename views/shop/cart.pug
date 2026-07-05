@@ -11,17 +11,17 @@ block content
                     each p in products
                         li.cart-item
                             div.cart-item__info
-                                span.cart-item__title #{p.title || 'No Title'}
+                                span.cart-item__title #{p.productId.title || 'No Title'}
                                 span.cart-item__qty Quantity: #{p.quantity || 0}
                             form(action="/cart-delete-item", method="POST")
-                                input(type="hidden", name="productId", value=p._id)
+                                input(type="hidden", name="productId", value=p.productId._id)
                                 button.cart-item__remove(type="submit") Remove
                 form(action="/create-order", method="POST")
                     button.order(type="submit") Order Now!
 
                 div.cart-total
                     span.cart-total__label Total
-                    span.cart-total__price $#{products.reduce((sum, p) => sum + (p.price * p.quantity), 0).toFixed(2)}
+                    span.cart-total__price $#{products.reduce((sum, p) => sum + (p.productId.price * p.quantity), 0).toFixed(2)}
 
             else
                 p.cart-empty 🛒 Your cart is empty.

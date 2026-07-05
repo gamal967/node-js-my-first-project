@@ -1,4 +1,5 @@
 
+const product = require('../models/product');
 const Product = require('../models/product');
 
 
@@ -20,7 +21,13 @@ exports.postAddProduct=(req,res,next)=>{
     const imageUrl=req.body.imageUrl;
     const price=req.body.price;
     const description=req.body.description;
-    const product =new Product(title, imageUrl, description, price,null,req.user._id);
+    const product =new Product({
+        title: title,
+        price: price,
+        description: description,
+        imageUrl: imageUrl,
+        userId: req.user
+    });
     product.save()
     .then(()=>{
         // console.log(result);
@@ -65,28 +72,28 @@ exports.postEditProduct=(req, res, next) => {
     const updatedPrice=req.body.price;
     // console.log(prodId);    
 
-    const product =new Product(
-        updatedTitle, 
-        updatedImageUrl, 
-        updatedDescription, 
-        updatedPrice,
-        prodId
-    );
-
-
-    product
-    .save()
-    .then(()=>{
-        console.log('Updated Product');
-        res.redirect('/admin/products');
-    })
-    .catch(err=>console.log(err));
+    Product.findById(prodId)
+        .then(product=>{
+            product.title=updatedTitle;
+            product.price=updatedPrice;
+            product.description=updatedDescription;
+            product.imageUrl=updatedImageUrl;
+            return product.save();
+        })
+        .then(()=>{
+            console.log('Updated Product');
+            res.redirect('/admin/products');
+        })
+        .catch(err=>console.log(err));
 }
 
 exports.getProducts=(req, res, next) => {
     // req.user.getProducts()
-    Product.fetchAll()
+    Product.find()
+    // .select('title price')
+    // .populate('userId', 'name')
     .then(result=>{
+        // console.log(result);
         res.render('admin/products', {
         prods: result,
         docTitle: 'Admin Products',
@@ -102,8 +109,9 @@ exports.getProducts=(req, res, next) => {
 exports.postDeleteProduct=(req, res, next) => {
     const prodId=req.body.productId;
     // req.user.destroy({where: {id: prodId}}) with MySQL
-    Product.deleteById(prodId) // with MongoDB
+    Product.findByIdAndDelete(prodId) // with MongoDB
     .then(()=>{
+
         console.log('Deleted Product');
         res.redirect('/admin/products');
     })

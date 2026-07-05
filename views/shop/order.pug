@@ -17,7 +17,8 @@ block content
                                 h2.order-id Order ##{order._id}
                             div.order-content
                                 ul.products-list
-                                    each product in order.items
+                                    each item in order.products
                                         li.product-item
-                                            span.product-title #{product.title}
-                                            span.product-quantity x#{product.quantity}
+                                            span.product-title #{item.product.title}
+                                            span.product-quantity x#{item.quantity}
+                h3.total-orders Total Orders: #{totalOrders}

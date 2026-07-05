@@ -16,4 +16,4 @@ block content
                 p.sale 20% off $#{product.price * 0.8}
                 form(action="/cart", method="post").form-btn
                     button(type="submit").btn Add to Cart
-                    input(type="hidden" name="productId" value=product.id)
+                    input(type="hidden" name="productId" value=product._id)
