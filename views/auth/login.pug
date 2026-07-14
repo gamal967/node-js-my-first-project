@@ -1,0 +1,26 @@
+
+extends ../layouts/main-layout.pug
+
+block style
+    link(rel="stylesheet", href="/css/auth.css")
+
+block content
+    main.main-content.auth-page
+        section.auth-card
+            .auth-card__header
+                h1.auth-card__title Welcome Back
+
+            form.auth-form(action="/login", method="POST")
+                .form-group
+                    label(for="email") Email
+                    input#email(type="email", name="email", placeholder="Enter your email", required)
+
+                .form-group
+                    label(for="password") Password
+                    input#password(type="password", name="password", placeholder="Enter your password", required)
+
+                button.auth-btn(type="submit") Log In
+
+            p.auth-card__footer
+                | Don’t have an account?
+                a(href="/signup") Create one

@@ -2,16 +2,25 @@
 const rootDir =require('./util/path');
 const path =require('path');
 const express =require('express');
-const app = express();
 const bodyParser =require('body-parser');   
 const errorController=require('./controllers/error');
 const adminRoutes =require('./routes/admin'); 
 const shopRoute =require('./routes/shop');  
+const authRoutes =require('./routes/auth');  
 const User =require('./models/user');
 const mongoose= require('mongoose');
+const session =require('express-session');
+const MongoDBStore =require('connect-mongodb-session')(session);
 
 
+const MONGODB_URI ='mongodb://gamalelctron2332_db_user:gggmmmlll333@ac-0pastqb-shard-00-00.akdhoiv.mongodb.net:27017,ac-0pastqb-shard-00-01.akdhoiv.mongodb.net:27017,ac-0pastqb-shard-00-02.akdhoiv.mongodb.net:27017/shop?ssl=true&replicaSet=atlas-ogso4t-shard-0&authSource=admin&appName=Cluster0'
 
+const app = express();
+// excute mongodb store constructor
+const store = new MongoDBStore({
+    uri: MONGODB_URI,
+    collection: 'sessions'
+})
 
 
 
@@ -19,29 +28,51 @@ app.set('view engine','pug');
 app.set('views','views');
 
 
-
+//Middlewares
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(express.static(path.join(rootDir,'public')));
+app.use(
+    session({
+        secret: 'my secret key',
+        resave: false,
+        saveUninitialized: false,
+        store: store
+}));
 
-app.use((req,res,next)=>{
-    User.findById('6a42938159890bb50d44b632')
+
+//AI{
+app.use((req, res, next) => {
+    res.locals.flashMessage = req.session.flashMessage;
+    delete req.session.flashMessage;
+    next();
+});
+//}
+
+app.use((req, res, next) => {
+    if(!req.session.user){
+        return next();
+    }
+    User.findById(req.session.user._id)
     .then(user=>{
+
         req.user = user;
         next();
+        
     })
     .catch(err=>console.log(err));
-    
-});
+})
 
+
+//Routes
 app.use('/admin',adminRoutes);
 app.use(shopRoute);
-
+app.use(authRoutes);
 app.use(errorController.get404);
 
 
 mongoose
     .connect(
-        'mongodb://gamalelctron2332_db_user:gggmmmlll333@ac-0pastqb-shard-00-00.akdhoiv.mongodb.net:27017,ac-0pastqb-shard-00-01.akdhoiv.mongodb.net:27017,ac-0pastqb-shard-00-02.akdhoiv.mongodb.net:27017/shop?ssl=true&replicaSet=atlas-ogso4t-shard-0&authSource=admin&appName=Cluster0'
+        MONGODB_URI
     )
     .then(() => {
         User.findOne().then(user => {

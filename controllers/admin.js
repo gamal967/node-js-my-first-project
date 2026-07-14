@@ -10,7 +10,8 @@ exports.getAddProduct = (req, res, next) => {
         docTitle: 'Add Product',
         path: '/admin/add-product',
         editing: false, // ✅ false because this is Add page
-        product: {}     // ✅ empty object so Pug doesn't crash
+        product: {},     // ✅ empty object so Pug doesn't crash
+        isAu: req.session.isloggedIn,
     });
 }
 
@@ -57,7 +58,8 @@ exports.getEditProduct=(req, res, next) => {
             docTitle: 'Edit Product',
             path: '/admin/edit-product',
             editing: editMode,
-            product: result
+            product: result,
+            isAu: req.session.isloggedIn,
         });
     })
     .catch(err=>console.log(err));
@@ -98,6 +100,7 @@ exports.getProducts=(req, res, next) => {
         prods: result,
         docTitle: 'Admin Products',
         path: '/admin/products',
+        isAu: req.session.isloggedIn,
         
         });
     })

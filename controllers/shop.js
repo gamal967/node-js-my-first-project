@@ -16,6 +16,7 @@ exports.getProducts = (req, res, next) => {
             prods: products,
             docTitle: 'Shop',
             path: '/products',
+            isAu: req.session.isloggedIn,
         });
 
     })
@@ -31,6 +32,7 @@ exports.getIndex = (req, res, next) => {
             prods: products,
             docTitle: 'Shop',
             path: '/',
+            isAu: req.session.isloggedIn,
         });
 
     })
@@ -47,6 +49,7 @@ exports.getCart=(req, res, next) => {
                 docTitle: 'Your Cart',
                 path: '/cart',
                 products: products,
+                isAu: req.session.isloggedIn,
             });
         })
         .catch(err=>console.log(err)); 
@@ -57,16 +60,37 @@ exports.getCart=(req, res, next) => {
 exports.postCart=(req, res, next) => {
 
     const prodId=req.body.productId;
-    Product.findById(prodId)
-    .then(product=>{
-        return req.user.addToCart(product);
-    })
-    .then(result=>{
-        console.log(result);
-        // console.log('Added to cart');
-        return res.redirect('/cart');
-    })
-    .catch(err=>console.log(err));
+    if(req.session.isloggedIn){
+        Product.findById(prodId)
+        .then(product=>{
+            return req.user.addToCart(product);
+        })
+        .then(result=>{
+            //AI{
+            req.session.flashMessage = {
+                type: 'success',
+                text: 'Added to cart!'
+            };
+            return req.session.save(err => {
+                if (err) console.log(err);
+                //}
+                return res.redirect('/cart');
+            });
+        })
+        .catch(err=>console.log(err));
+    }
+    else{
+        //AI{
+        req.session.flashMessage = {
+            type: 'error',
+            text: 'You should login first.'
+        };
+        return req.session.save(err => {
+            if (err) console.log(err);
+            //}
+            res.redirect('/login');
+        });
+    }
 }
 
 exports.postCartDelete=(req, res, next) => {
@@ -90,6 +114,7 @@ exports.getDetails=(req, res, next) => {
                 product: result,
                 docTitle: result.title,
                 path: '/products',
+                isAu: req.session.isloggedIn,
             });
     })
     .catch(err=>console.log(err));
@@ -98,15 +123,6 @@ exports.getDetails=(req, res, next) => {
 
 exports.getOrders=(req, res, next) => {
     req.user.fetchOrders()
-    // .then(orders=>{
-        
-    //     res.render('shop/order', {
-    //         docTitle: 'Your Orders',
-    //         path: '/orders',
-    //         orders: orders,
-    //     });
-        
-    // })
     .then((orders)=>{
         req.user.totalOrders()
         .then(totalOrders=>{
@@ -115,6 +131,7 @@ exports.getOrders=(req, res, next) => {
                 path: '/orders',
                 orders: orders,
                 totalOrders: totalOrders,
+                isAu: req.session.isloggedIn,
             });
         })
     })
@@ -123,7 +140,7 @@ exports.getOrders=(req, res, next) => {
 
 
 exports.postOrder=(req, res, next) => {
-    req.user
+    req.session.user
         .populate('cart.items.productId')
         .then(user=>{
             const products=user.cart.items.map(i=>{
@@ -131,8 +148,8 @@ exports.postOrder=(req, res, next) => {
             });
             const order=new Order({
                 user: {
-                    name: req.user.name,
-                    userId: req.user
+                    name: req.session.user.name,
+                    userId: req.session.user
                 },
                 products: products
             })
