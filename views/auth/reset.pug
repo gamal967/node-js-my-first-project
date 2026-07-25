@@ -1,0 +1,22 @@
+
+extends ../layouts/main-layout.pug
+
+block style
+    link(rel="stylesheet", href="/css/auth.css")
+
+block content
+    main.main-content.auth-page
+        section.auth-card
+
+            if errorMessage && errorMessage != ''
+                div.errorMessage #{errorMessage}
+
+            form.auth-form(action="/reset", method="POST")
+                .form-group
+                    label(for="email") Email
+                    input#email(type="email", name="email", placeholder="Enter your email", required)
+
+                input(type="hidden", name="_csrf", value=csrfToken)
+                button.auth-btn(type="submit") Reset Password
+
+            

@@ -14,9 +14,11 @@ block content
                                 span.cart-item__title #{p.productId.title || 'No Title'}
                                 span.cart-item__qty Quantity: #{p.quantity || 0}
                             form(action="/cart-delete-item", method="POST")
+                                input(type="hidden", name="_csrf", value=csrfToken)
                                 input(type="hidden", name="productId", value=p.productId._id)
                                 button.cart-item__remove(type="submit") Remove
                 form(action="/create-order", method="POST")
+                    input(type="hidden", name="_csrf", value=csrfToken)
                     button.order(type="submit") Order Now!
 
                 div.cart-total

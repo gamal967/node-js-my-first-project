@@ -1,0 +1,15 @@
+
+extends ../layouts/main-layout.pug
+
+block style
+    link(rel="stylesheet", href="/css/auth.css")
+
+block content
+    main.main-content.auth-page
+        section.auth-card
+            .auth-card__header
+                h1.auth-card__title Check your email
+
+            .auth-message
+                p We sent a password reset link to your email address.
+                p Please check your inbox and follow the link to continue.

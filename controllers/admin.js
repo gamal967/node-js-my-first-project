@@ -11,7 +11,7 @@ exports.getAddProduct = (req, res, next) => {
         path: '/admin/add-product',
         editing: false, // ✅ false because this is Add page
         product: {},     // ✅ empty object so Pug doesn't crash
-        isAu: req.session.isloggedIn,
+        
     });
 }
 
@@ -59,7 +59,7 @@ exports.getEditProduct=(req, res, next) => {
             path: '/admin/edit-product',
             editing: editMode,
             product: result,
-            isAu: req.session.isloggedIn,
+            
         });
     })
     .catch(err=>console.log(err));
@@ -76,31 +76,38 @@ exports.postEditProduct=(req, res, next) => {
 
     Product.findById(prodId)
         .then(product=>{
+            const userId=req.user._id;
+            if(product.userId.toString()!==userId.toString()){
+                return res.redirect('/');
+            };
+
             product.title=updatedTitle;
             product.price=updatedPrice;
             product.description=updatedDescription;
             product.imageUrl=updatedImageUrl;
-            return product.save();
-        })
-        .then(()=>{
+            return product.save()
+            .then(()=>{
             console.log('Updated Product');
             res.redirect('/admin/products');
+            })
+            .catch(err=>console.log(err));
         })
+        
         .catch(err=>console.log(err));
 }
 
 exports.getProducts=(req, res, next) => {
     // req.user.getProducts()
-    Product.find()
-    // .select('title price')
-    // .populate('userId', 'name')
+    const userId=req.user._id;
+    Product.find({userId,userId})
+    // .populate('userId')
     .then(result=>{
         // console.log(result);
         res.render('admin/products', {
         prods: result,
         docTitle: 'Admin Products',
         path: '/admin/products',
-        isAu: req.session.isloggedIn,
+        
         
         });
     })
@@ -112,7 +119,7 @@ exports.getProducts=(req, res, next) => {
 exports.postDeleteProduct=(req, res, next) => {
     const prodId=req.body.productId;
     // req.user.destroy({where: {id: prodId}}) with MySQL
-    Product.findByIdAndDelete(prodId) // with MongoDB
+    Product.deleteOne({_id: prodId , userId: req.user._id}) // with MongoDB
     .then(()=>{
 
         console.log('Deleted Product');

@@ -11,6 +11,8 @@ const User =require('./models/user');
 const mongoose= require('mongoose');
 const session =require('express-session');
 const MongoDBStore =require('connect-mongodb-session')(session);
+const csrf =require('csurf');
+const flash =require('connect-flash');
 
 
 const MONGODB_URI ='mongodb://gamalelctron2332_db_user:gggmmmlll333@ac-0pastqb-shard-00-00.akdhoiv.mongodb.net:27017,ac-0pastqb-shard-00-01.akdhoiv.mongodb.net:27017,ac-0pastqb-shard-00-02.akdhoiv.mongodb.net:27017/shop?ssl=true&replicaSet=atlas-ogso4t-shard-0&authSource=admin&appName=Cluster0'
@@ -30,7 +32,9 @@ app.set('views','views');
 
 //Middlewares
 app.use(bodyParser.urlencoded({extended:false}));
+
 app.use(express.static(path.join(rootDir,'public')));
+
 app.use(
     session({
         secret: 'my secret key',
@@ -39,14 +43,17 @@ app.use(
         store: store
 }));
 
+app.use(csrf());
 
-//AI{
-app.use((req, res, next) => {
-    res.locals.flashMessage = req.session.flashMessage;
-    delete req.session.flashMessage;
-    next();
-});
-//}
+app.use(flash());
+
+// //AI{
+// app.use((req, res, next) => {
+//     res.locals.flashMessage = req.session.flashMessage;
+//     delete req.session.flashMessage;
+//     next();
+// });
+// //}
 
 app.use((req, res, next) => {
     if(!req.session.user){
@@ -61,7 +68,11 @@ app.use((req, res, next) => {
     })
     .catch(err=>console.log(err));
 })
-
+app.use((req, res, next) => {
+    res.locals.isAu = req.session.isloggedIn;
+    res.locals.csrfToken = req.csrfToken();
+    next();
+})
 
 //Routes
 app.use('/admin',adminRoutes);
@@ -75,19 +86,6 @@ mongoose
         MONGODB_URI
     )
     .then(() => {
-        User.findOne().then(user => {
-            if (!user) {
-                const user = new User({
-                    name: 'Gamal',
-                    email: 'GeMe@example.com',
-                    cart: {
-                        items: []
-                    }
-                });
-                user.save();
-            }
-            
-        })
         app.listen(3000);
         console.log('Connected!');
     })
