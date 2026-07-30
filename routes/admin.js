@@ -1,5 +1,5 @@
 
-
+const { check ,body} = require('express-validator');
 const express =require('express');
 const router =express.Router();
 
@@ -8,17 +8,69 @@ const isAuth =require('../middleware/is-auth');
 
 
 // /admin/add-product => GET
-router.get('/add-product', isAuth, adminController.getAddProduct); 
+router.get('/add-product'
+    , isAuth
+    , adminController.getAddProduct); 
+
+// // /admin/product => POST
+router.post('/product'
+    ,[
+        body('title')
+            .isString()
+            .isLength({min:2})
+            .trim()
+            .withMessage('Title must be at least 2 characters long')
+        ,body('imageUrl')
+            .isURL({
+            protocols: ['http', 'https'],
+            require_protocol: true
+            })
+            .trim()
+            .withMessage('Please enter a valid image URL.')
+        ,body('price')
+            .isFloat({ min: 0.01 })
+            .trim()
+            .withMessage('Price must be a positive number')
+        ,body('description')
+            .trim()
+            .isLength({min:5, max:400})
+            .withMessage('Description must be at least 5 characters long')
+    ]
+    ,isAuth
+    ,adminController.postAddProduct);
+
 
 // // /admin/products => GETX
 router.get('/products', isAuth,adminController.getProducts);
 
-// // /admin/product => POST
-router.post('/product',isAuth,adminController.postAddProduct);
 
 router.get('/edit-product/:productId',isAuth,adminController.getEditProduct);
 
-router.post('/edit-product',isAuth,adminController.postEditProduct);
+router.post('/edit-product'
+    ,[
+        body('title')
+            .isString()
+            .isLength({min:2})
+            .trim()
+            .withMessage('Title must be at least 2 characters long')
+        ,body('imageUrl')
+            .isURL({
+            protocols: ['http', 'https'],
+            require_protocol: true
+            })
+            .trim()
+            .withMessage('Please enter a valid image URL.')
+        ,body('price')
+            .isFloat({ min: 0.01 })
+            .trim()
+            .withMessage('Price must be a positive number')
+        ,body('description')
+            .trim()
+            .isLength({min:5, max:400})
+            .withMessage('Description must be at least 5 characters long')
+    ]
+    ,isAuth
+    ,adminController.postEditProduct);
 
 router.post('/delete-product',isAuth,adminController.postDeleteProduct);    
 

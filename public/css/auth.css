@@ -183,3 +183,6 @@
   font-size: 0.95rem;
   text-align: center;
 }
+.form-group input.invalid {
+  border: 1px solid #dc2626;
+}

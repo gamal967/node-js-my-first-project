@@ -1,16 +1,20 @@
+
 const User = require("../models/user");
 
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const sendgrid = require('nodemailer-sendgrid-transport');
 const crypto = require('crypto');
+const { validationResult } = require('express-validator');
+
 
 const transporter = nodemailer.createTransport(sendgrid({
     auth: {
         api_key: process.env.SENDGRID_API_KEY
     }
 }));
-
+// console.log(process.env.SENDGRID_API_KEY);
+// console.log(process.env.SENDGRID_API_KEY);
 exports.getLogin = (req, res, next) => {
     // const isloggedIn = req
     //     .get('Cookie')
@@ -21,6 +25,10 @@ exports.getLogin = (req, res, next) => {
         docTitle: 'Login',
         path: '/login',
         errorMessage: req.flash('error'),
+        validationError: [],
+        oldInputs: {
+            email: '',
+        }
         
     });
     
@@ -29,13 +37,23 @@ exports.getLogin = (req, res, next) => {
 exports.postLogin = (req, res, next) => {
     const email =req.body.email;
     const password =req.body.password;
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        console.log(errors.array());
+        return res.status(422).render('auth/login', {
+            docTitle: 'Login',
+            path: '/login',
+            errorMessage: errors.array()[0].msg,
+            validationError: errors.array(),
+            oldInputs: {
+                email: email,
+            }
+        });
+    }
 
     User.findOne({email: email})
     .then(user=>{
-        if(!user){
-            req.flash('error', 'Your email or password is incorrect!');
-            return res.redirect('/login');
-        }
+    // i put the email validation in route not in controller
         bcrypt
             .compare(password, user.password)
             .then(doMatch=>{
@@ -44,6 +62,7 @@ exports.postLogin = (req, res, next) => {
                     req.session.user = {
                         _id: user._id.toString(),
                         email: user.email,
+                        
 
                     }; 
                     
@@ -52,8 +71,15 @@ exports.postLogin = (req, res, next) => {
                         return res.redirect('/');
                     });
                 }
-                req.flash('error', 'Your email or password is incorrect!');
-                return res.redirect('/login');
+                return res.status(422).render('auth/login', {
+                    docTitle: 'Login',
+                    path: '/login',
+                    errorMessage: 'Your email or password is incorrect!',
+                    validationError: errors.array(),
+                    oldInputs: {
+                        email: email,
+                    }
+                })
             })
             .catch(err=>{
                 console.log(err)
@@ -76,11 +102,16 @@ exports.postLogout = (req, res, next) => {
 };
 
 exports.getSignup = (req, res, next) => {
+
     
     res.render('auth/sign_up', {
         docTitle: 'Signup',
         path: '/signup',
         errorMessage: req.flash('error'),
+        oldInputs: {
+            email: '',
+        },
+        validationError: []
 
     });
     
@@ -89,14 +120,20 @@ exports.getSignup = (req, res, next) => {
 exports.postSignup = (req, res, next) => {
     const email =req.body.email;
     const password =req.body.password;
-    const confirmPassword =req.body.confirmPassword;
-    User.findOne({email: email})
-        .then((user)=>{
-            if(user){
-                req.flash('error', 'Email already exists!');
-                return res.redirect('/signup');            
-            }
-            return bcrypt
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        console.log(errors.array());
+        return res.status(422).render('auth/sign_up', {
+            docTitle: 'Signup',
+            path: '/signup',
+            errorMessage: errors.array()[0].msg,
+            oldInputs: {
+                email: email,
+            },
+            validationError: errors.array()
+        })
+    }
+        bcrypt
             .hash(password, 12)
             .then(hashedPassword=>{
                 const newUser= new User({
@@ -125,8 +162,6 @@ exports.postSignup = (req, res, next) => {
                 console.log(err);
                 res.redirect('/signup');
             })
-        })
-        .catch(err=>console.log(err));
 };
 
 exports.getReset = (req, res, next) => {

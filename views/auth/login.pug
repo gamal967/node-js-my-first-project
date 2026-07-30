@@ -16,11 +16,23 @@ block content
             form.auth-form(action="/login", method="POST")
                 .form-group
                     label(for="email") Email
-                    input#email(type="email", name="email", placeholder="Enter your email", required)
+                    input#email(
+                        
+                        ,value=oldInputs.email
+                        ,type="email"
+                        , name="email"
+                        , placeholder="Enter your email"
+                        , required)
 
                 .form-group
                     label(for="password") Password
-                    input#password(type="password", name="password", placeholder="Enter your password", required)
+                    input#password(
+                        
+                        
+                        ,type="password"
+                        , name="password"
+                        , placeholder="Enter your password"
+                        , required)
                 a.forgot-password(href="/reset") Forgot Password ?
 
                 input(type="hidden", name="_csrf", value=csrfToken)

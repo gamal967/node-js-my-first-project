@@ -1,4 +1,5 @@
 
+require('dotenv').config();
 const rootDir =require('./util/path');
 const path =require('path');
 const express =require('express');
@@ -13,7 +14,6 @@ const session =require('express-session');
 const MongoDBStore =require('connect-mongodb-session')(session);
 const csrf =require('csurf');
 const flash =require('connect-flash');
-
 
 const MONGODB_URI ='mongodb://gamalelctron2332_db_user:gggmmmlll333@ac-0pastqb-shard-00-00.akdhoiv.mongodb.net:27017,ac-0pastqb-shard-00-01.akdhoiv.mongodb.net:27017,ac-0pastqb-shard-00-02.akdhoiv.mongodb.net:27017/shop?ssl=true&replicaSet=atlas-ogso4t-shard-0&authSource=admin&appName=Cluster0'
 

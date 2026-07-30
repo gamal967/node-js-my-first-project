@@ -7,41 +7,75 @@ block style
 
 block content 
     main.main-content 
-        form(action=`${editing ? '/admin/edit-product' : '/admin/product'}`, method="POST", id="add-product-form").product-form
-            label(for="title") Product Name
-            input.input(type="text", name="title", id="title", placeholder="Product name" value=editing ? product.title : '')
-            label(for="imageUrl") Product Image
-            input.input(type="text", name="imageUrl", id="imageUrl", placeholder="Product image URL" value=editing ? product.imageUrl : '')
-            label(for="price") Price
-            input.input(type="number", name="price", id="price", placeholder="Product price", step="0.01" value=editing ? product.price : '')
-            input(type="hidden", name="_csrf", value=csrfToken)
+        section.admin-card
+            if errorMessage && errorMessage != ''
+                div.errorMessage #{errorMessage}
 
-            label(for="description") Description
-            textarea.input(name="description" ,id="description",rows="3" cols="50" placeholder="Product description" ) #{editing ? product.description : ''}
-            if editing
-                input(type="hidden", name="productId", value=""+product._id) 
-            button.submit(type="submit") #{editing ? 'Update Product' : 'Add Product'}
+            form(action=`${editing ? '/admin/edit-product' : '/admin/product'}`, method="POST", id="add-product-form").product-form
+                label(for="title") Product Name
+                input.input(
+                type="text"
+                ,class=(validationError.find(e=> e.path === 'title') ? 'invalid' : '')
+                , name="title"
+                , id="title"
+                , placeholder="Product name"
+                , value=editing ? product.title : oldInputs.title
+                , required)
+
+                label(for="imageUrl") Product Image
+                input.input(
+                    type="text"
+                    class=(validationError.find(e=> e.path === 'imageUrl') ? 'invalid' : '')
+                    , name="imageUrl"
+                    , id="imageUrl"
+                    , placeholder="Product image URL" 
+                    ,value=editing ? product.imageUrl : oldInputs.imageUrl
+                    , required)
+
+                label(for="price") Price
+                input.input(
+                    type="number"
+                    class=(validationError.find(e=> e.path === 'price') ? 'invalid' : '')
+                    , name="price"
+                    , id="price"
+                    , placeholder="Product price"
+                    , step="0.01" 
+                    ,value=editing ? product.price : oldInputs.price
+                    , required)
+
+                input(type="hidden", name="_csrf", value=csrfToken)
+
+                label(for="description") Description
+                textarea.input(
+                    name="description" 
+                    ,class=(validationError.find(e=> e.path === 'description') ? 'invalid' : '')
+                    ,id="description"
+                    ,rows="3" cols="50" 
+                    ,placeholder="Product description" ) #{editing ? product.description : oldInputs.description}
+                if editing
+                    input(type="hidden", name="productId", value=""+product._id) 
+                button.submit(type="submit") #{editing ? 'Update Product' : 'Add Product'}
             //AI{
-            p#error-msg
+        //-     p#error-msg
 
-        script.
-            (function(){
-                var form = document.getElementById('add-product-form');
-                var input = document.getElementById('title');
-                var err = document.getElementById('error-msg');
-                if(!form) return;
-                form.addEventListener('submit', function(e){
-                    if(!input.value || input.value.trim() === ''){
-                        e.preventDefault();
-                        err.textContent = 'Please write a product name.';
-                        err.style.color = 'red';
-                        input.focus();
-                    } else {
-                        err.textContent = '';
-                    }
-                });
-                input.addEventListener('input', function(){
-                    if(input.value && input.value.trim() !== '') err.textContent = '';
-                });
-            })();
+        //- script.
+        //-     (function(){
+        //-         var form = document.getElementById('add-product-form');
+        //-         var input = document.getElementById('title');
+        //-         var err = document.getElementById('error-msg');
+        //-         if(!form) return;
+        //-         form.addEventListener('submit', function(e){
+        //-             if(!input.value || input.value.trim() === ''){
+        //-                 e.preventDefault();
+        //-                 err.textContent = 'Please write a product name.';
+        //-                 err.style.color = 'red';
+        //-                 input.focus();
+        //-             } else {
+        //-                 err.textContent = '';
+        //-             }
+        //-         });
+        //-         input.addEventListener('input', function(){
+        //-             if(input.value && input.value.trim() !== '') err.textContent = '';
+        //-         });
+        //-     })();
             //}
