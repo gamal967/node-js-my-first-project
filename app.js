@@ -47,6 +47,15 @@ app.use(csrf());
 
 app.use(flash());
 
+
+//Tokens
+app.use((req, res, next) => {
+    res.locals.isAu = req.session.isloggedIn;
+    res.locals.csrfToken = req.csrfToken();
+    next();
+})
+
+
 // //AI{
 // app.use((req, res, next) => {
 //     res.locals.flashMessage = req.session.flashMessage;
@@ -56,29 +65,45 @@ app.use(flash());
 // //}
 
 app.use((req, res, next) => {
+    // throw new Error('Error out');
     if(!req.session.user){
         return next();
     }
     User.findById(req.session.user._id)
     .then(user=>{
+        throw new Error('Error');
+        if(!user){
+            return next();
+        }
 
         req.user = user;
         next();
         
     })
-    .catch(err=>console.log(err));
-})
-app.use((req, res, next) => {
-    res.locals.isAu = req.session.isloggedIn;
-    res.locals.csrfToken = req.csrfToken();
-    next();
-})
+    .catch(err=>{
+        // throw new Error(err);
+        next(new Error(err)); //the next error is used with async code & thorws error is used with sync
+    });
+});
+
+
+
 
 //Routes
 app.use('/admin',adminRoutes);
 app.use(shopRoute);
 app.use(authRoutes);
+app.use('/500',errorController.get500);
 app.use(errorController.get404);
+
+app.use((error, req, res, next) => {
+    res.status(500).render('500'
+        , {
+            docTitle: 'error 500 '
+            ,path: '/500'
+            ,islogedIn: req.session.islogedIn
+        });
+})
 
 
 mongoose

@@ -2,6 +2,7 @@
 
 const Product = require('../models/product');
 const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 
 
 
@@ -52,6 +53,7 @@ exports.postAddProduct=(req,res,next)=>{
         });
     }
     const product =new Product({
+        // _id: new mongoose.Types.ObjectId('6a42982d0b0bfdf1943ed722'),
         title: title,
         price: price,
         description: description,
@@ -66,7 +68,11 @@ exports.postAddProduct=(req,res,next)=>{
         
         
     })
-    .catch(err=>console.log(err));
+    .catch(err=>{
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+    });
 }
 exports.getEditProduct=(req, res, next) => {
     const editMode=req.query.edit;
@@ -98,7 +104,11 @@ exports.getEditProduct=(req, res, next) => {
             }
         });
     })
-    .catch(err=>console.log(err));
+    .catch(err=>{
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+    });
     
 }
 
@@ -156,7 +166,11 @@ exports.postEditProduct=(req, res, next) => {
             .catch(err=>console.log(err));
         })
         
-        .catch(err=>console.log(err));
+        .catch(err=>{
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+    });
 }
 
 exports.getProducts=(req, res, next) => {
@@ -174,7 +188,11 @@ exports.getProducts=(req, res, next) => {
         
         });
     })
-    .catch(err=>console.log(err));
+    .catch(err=>{
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+    });
     
 }
 
@@ -188,6 +206,10 @@ exports.postDeleteProduct=(req, res, next) => {
         console.log('Deleted Product');
         res.redirect('/admin/products');
     })
-    .catch(err=>console.log(err));
+    .catch(err=>{
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+    });
     
 }
