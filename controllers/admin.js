@@ -3,6 +3,7 @@
 const Product = require('../models/product');
 const { validationResult } = require('express-validator');
 const mongoose = require('mongoose');
+const fileHelper = require('../util/file');
 
 
 
@@ -29,10 +30,28 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.postAddProduct=(req,res,next)=>{
     const title=req.body.title;
-    const imageUrl=req.body.imageUrl;
+    const image=req.file;
     const price=req.body.price;
     const description=req.body.description;
     const errors = validationResult(req);
+    // console.log(imageUrl);
+
+    if(!image){
+        return res.status(422).render('admin/edit-product', {
+            docTitle: 'Add Product',
+            path: '/admin/add-product',
+            editing: false, // ✅ false because this is Add page
+            product: {},     // ✅ empty object so Pug doesn't crash
+            validationError: [],
+            errorMessage: 'Attached file is not an image',
+            oldInputs: {
+                title: title,
+                price: price,
+                description: description
+            }
+        })
+    }
+
 
     if(!errors.isEmpty()){
         console.log(errors.array());
@@ -52,6 +71,9 @@ exports.postAddProduct=(req,res,next)=>{
             
         });
     }
+
+    const imageUrl=image.path;
+
     const product =new Product({
         // _id: new mongoose.Types.ObjectId('6a42982d0b0bfdf1943ed722'),
         title: title,
@@ -115,7 +137,7 @@ exports.getEditProduct=(req, res, next) => {
 exports.postEditProduct=(req, res, next) => {
     const prodId=req.body.productId;
     const updatedTitle=req.body.title;
-    const updatedImageUrl=req.body.imageUrl;
+    const image=req.file;
     const updatedDescription=req.body.description;
     const updatedPrice=req.body.price;
     // console.log(prodId);   
@@ -130,7 +152,6 @@ exports.postEditProduct=(req, res, next) => {
             product: {
                 _id: prodId,
                 title: updatedTitle,
-                imageUrl: updatedImageUrl,
                 price: updatedPrice,
                 description: updatedDescription
             },
@@ -157,7 +178,10 @@ exports.postEditProduct=(req, res, next) => {
             product.title=updatedTitle;
             product.price=updatedPrice;
             product.description=updatedDescription;
-            product.imageUrl=updatedImageUrl;
+            if(image){
+                fileHelper.deleteFile(product.imageUrl);
+                product.imageUrl=image.path;
+            }
             return product.save()
             .then(()=>{
             console.log('Updated Product');
@@ -200,7 +224,14 @@ exports.getProducts=(req, res, next) => {
 exports.postDeleteProduct=(req, res, next) => {
     const prodId=req.body.productId;
     // req.user.destroy({where: {id: prodId}}) with MySQL
-    Product.deleteOne({_id: prodId , userId: req.user._id}) // with MongoDB
+    Product.findById(prodId)
+    .then(product=>{
+        if(!product){
+            return next(new Error('Product not found'));
+        }
+        fileHelper.deleteFile(product.imageUrl);
+        return Product.deleteOne({_id: prodId , userId: req.user._id})
+    })
     .then(()=>{
 
         console.log('Deleted Product');

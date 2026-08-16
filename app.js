@@ -14,6 +14,7 @@ const session =require('express-session');
 const MongoDBStore =require('connect-mongodb-session')(session);
 const csrf =require('csurf');
 const flash =require('connect-flash');
+const multer =require('multer');
 
 const MONGODB_URI ='mongodb://gamalelctron2332_db_user:gggmmmlll333@ac-0pastqb-shard-00-00.akdhoiv.mongodb.net:27017,ac-0pastqb-shard-00-01.akdhoiv.mongodb.net:27017,ac-0pastqb-shard-00-02.akdhoiv.mongodb.net:27017/shop?ssl=true&replicaSet=atlas-ogso4t-shard-0&authSource=admin&appName=Cluster0'
 
@@ -24,7 +25,26 @@ const store = new MongoDBStore({
     collection: 'sessions'
 })
 
+const fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'images');
+    },
+    filename: (req, file, cb) => {
+        cb(null, new Date().toISOString() + '-' + file.originalname);
+    }
+});
 
+const fileFilter = (req, file, cb) => {
+    if(
+        file.mimetype === 'image/png' ||
+        file.mimetype === 'image/jpg' ||
+        file.mimetype === 'image/jpeg'
+    ) {
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+}
 
 app.set('view engine','pug');
 app.set('views','views');
@@ -33,7 +53,10 @@ app.set('views','views');
 //Middlewares
 app.use(bodyParser.urlencoded({extended:false}));
 
+app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('image'));
+
 app.use(express.static(path.join(rootDir,'public')));
+app.use('/images',express.static(path.join(rootDir,'images')));
 
 app.use(
     session({
@@ -71,7 +94,7 @@ app.use((req, res, next) => {
     }
     User.findById(req.session.user._id)
     .then(user=>{
-        throw new Error('Error');
+        // throw new Error('Error');
         if(!user){
             return next();
         }

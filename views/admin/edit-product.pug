@@ -11,7 +11,7 @@ block content
             if errorMessage && errorMessage != ''
                 div.errorMessage #{errorMessage}
 
-            form(action=`${editing ? '/admin/edit-product' : '/admin/product'}`, method="POST", id="add-product-form").product-form
+            form(action=`${editing ? '/admin/edit-product' : '/admin/product'}`, method="POST", id="add-product-form", enctype="multipart/form-data").product-form
                 label(for="title") Product Name
                 input.input(
                 type="text"
@@ -24,13 +24,12 @@ block content
 
                 label(for="imageUrl") Product Image
                 input.input(
-                    type="text"
-                    class=(validationError.find(e=> e.path === 'imageUrl') ? 'invalid' : '')
-                    , name="imageUrl"
-                    , id="imageUrl"
-                    , placeholder="Product image URL" 
-                    ,value=editing ? product.imageUrl : oldInputs.imageUrl
-                    , required)
+                    type="file"
+                    , name="image"
+                    , id="image"
+                    , placeholder="Product image" 
+                    )
+
 
                 label(for="price") Price
                 input.input(

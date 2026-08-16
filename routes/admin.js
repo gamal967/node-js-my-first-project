@@ -20,13 +20,7 @@ router.post('/product'
             .isLength({min:2})
             .trim()
             .withMessage('Title must be at least 2 characters long')
-        ,body('imageUrl')
-            .isURL({
-            protocols: ['http', 'https'],
-            require_protocol: true
-            })
-            .trim()
-            .withMessage('Please enter a valid image URL.')
+        
         ,body('price')
             .isFloat({ min: 0.01 })
             .trim()
@@ -53,13 +47,7 @@ router.post('/edit-product'
             .isLength({min:2})
             .trim()
             .withMessage('Title must be at least 2 characters long')
-        ,body('imageUrl')
-            .isURL({
-            protocols: ['http', 'https'],
-            require_protocol: true
-            })
-            .trim()
-            .withMessage('Please enter a valid image URL.')
+        
         ,body('price')
             .isFloat({ min: 0.01 })
             .trim()

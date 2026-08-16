@@ -12,7 +12,7 @@ block content
                             header.card__header
                                 h1.product_title #{product.title}
                             div.card_image
-                                img(src=product.imageUrl, alt=product.title)
+                                img(src='/'+product.imageUrl, alt=product.title)
                             div.card__content
                                 h2.product-price $#{product.price}
                                 p.product_description #{product.description}

@@ -95,3 +95,33 @@
     font-weight: 700;
     letter-spacing: 0.5px;
 }
+
+/* Invoice link styling - styled like a paper/button */
+.order-content a[href^="/orders/"]{
+    display:inline-block;
+    margin-top:12px;
+    background: rgb(158,85,223);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    box-shadow: 0 6px 18px rgba(158,85,223,0.14);
+    transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
+}
+.order-content a[href^="/orders/"]::before{
+    content: "📄";
+    margin-right:8px;
+    display:inline-block;
+    vertical-align:middle;
+}
+.order-content a[href^="/orders/"]:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(158,85,223,0.18);
+}
+
+@media print{
+    /* hide interactive links when printing */
+    .order-content a[href^="/orders/"]{display:none}
+}

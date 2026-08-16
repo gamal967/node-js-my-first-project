@@ -21,4 +21,5 @@ block content
                                         li.product-item
                                             span.product-title #{item.product.title}
                                             span.product-quantity x#{item.quantity}
+                                    a(href='/orders/'+order._id) invoice
                 h3.total-orders Total Orders: #{totalOrders}

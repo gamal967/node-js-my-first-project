@@ -8,7 +8,7 @@ block content
             h1 Product Detail
         div.product-detail-content
             div.product-image-container
-                img(src=product.imageUrl, alt=product.title).main-image
+                img(src='/'+product.imageUrl, alt=product.title).main-image
             div.product-info
                 h2.title #{product.title}
                 p.description #{product.description}
