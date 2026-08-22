@@ -8,44 +8,77 @@ const fs= require('fs');
 const path= require('path');
 const PDF = require('pdfkit');
 
-
+const ITEM_PER_PAGE = 2;
 
 
 exports.getProducts = (req, res, next) => {
-    Product.find()
-    .then(products=>{
-        res.render('shop/product-list', {
-            prods: products,
-            docTitle: 'Shop',
-            path: '/products',
-        });
+    const page = Number(req.query.page||1);
+    let totalItems;
 
-    })
-    .catch(err=>{
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
-    });
+    Product.find()
+        .countDocuments()
+        .then(numProducts=>{
+            totalItems=numProducts;
+            return Product.find()
+                .skip((page-1)*ITEM_PER_PAGE)
+                .limit(ITEM_PER_PAGE);
+        })
+        .then(products=>{
+            res.render('shop/product-list', {
+                prods: products,
+                docTitle: 'Shop',
+                path: '/products',
+                currentPage: page,
+                totalItems: totalItems,
+                hasNextPage: ITEM_PER_PAGE*page<totalItems,
+                hasPreviousPage: page>1,
+                nextPage: page+1,
+                previousPage: page-1,
+                lastPage: Math.ceil(totalItems/ITEM_PER_PAGE)
+            });
+
+        })
+        .catch(err=>{
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };
 
 
 
 exports.getIndex = (req, res, next) => {
-    Product.find()
-    .then(products=>{
-        res.render('shop/index', {
-            prods: products,
-            docTitle: 'Shop',
-            path: '/',
-            
-        });
+    const page = Number(req.query.page||1);
+    let totalItems;
 
-    })
-    .catch(err=>{
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
-    });
+    Product.find()
+        .countDocuments()
+        .then(numProducts=>{
+            totalItems=numProducts;
+            return Product.find()
+                .skip((page-1)*ITEM_PER_PAGE)
+                .limit(ITEM_PER_PAGE);
+        })
+        .then(products=>{
+            res.render('shop/index', {
+                prods: products,
+                docTitle: 'Shop',
+                path: '/',
+                currentPage: page,
+                totalItems: totalItems,
+                hasNextPage: ITEM_PER_PAGE*page<totalItems,
+                hasPreviousPage: page>1,
+                nextPage: page+1,
+                previousPage: page-1,
+                lastPage: Math.ceil(totalItems/ITEM_PER_PAGE)
+            });
+
+        })
+        .catch(err=>{
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
     
 };
 

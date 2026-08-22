@@ -1,0 +1,13 @@
+section.pagination
+                    if hasPreviousPage
+                        a.page-link(href=`?page=${previousPage}`) <
+                        a.page-link(href=`?page=${previousPage}`) #{previousPage}
+                    a.page-link.active(href=`?page=${currentPage}`) #{currentPage}
+                    if hasNextPage
+                        a.page-link(href=`?page=${nextPage}`) #{nextPage}
+                    
+                    if currentPage != lastPage && currentPage != (lastPage-1)
+                        span.page-link-dots ...
+                        a.page-link(href=`?page=${lastPage}`) #{lastPage}
+                    if hasNextPage
+                        a.page-link(href=`?page=${nextPage}`) >

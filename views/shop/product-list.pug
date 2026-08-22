@@ -22,5 +22,6 @@ block content
                                     button(type="submit").btn Add to Cart
                                     input(type="hidden" name="productId" value=product._id)
                                     input(type="hidden", name="_csrf", value=csrfToken)
+                include ../layouts/pagination
             else
                 h1 No Product Found

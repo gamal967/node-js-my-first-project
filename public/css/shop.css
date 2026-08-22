@@ -100,12 +100,13 @@ main {
   position: relative;
   z-index: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   flex: 1 1 auto;
   min-height: calc(100vh - 64px);
   width: 100%;
-  padding: 2rem 1rem;
+  padding: 2rem 1rem 3rem;
   animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -293,4 +294,59 @@ main > h1 {
 .btn:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.45);
   outline-offset: 3px;
+}
+
+/* ── Pagination ── */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.page-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 50%;
+  border: 1px solid rgba(199, 125, 255, 0.25);
+  background: rgba(255, 255, 255, 0.04);
+  color: #f2e7ff;
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.page-link:hover,
+.page-link:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(199, 125, 255, 0.65);
+  box-shadow: 0 10px 22px rgba(108, 63, 197, 0.22);
+  background: rgba(155, 93, 229, 0.12);
+}
+
+.page-link.active {
+  background: linear-gradient(135deg, rgba(155, 93, 229, 0.96), rgba(155, 93, 229, 0.82));
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 14px 30px rgba(108, 63, 197, 0.26);
+}
+
+/* ── Pagination dots ── */
+.page-link-dots {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.8rem;
+  height: 2.8rem;
+  color: rgba(220, 190, 255, 0.6);
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  user-select: none;
 }
