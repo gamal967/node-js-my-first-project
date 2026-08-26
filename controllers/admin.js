@@ -221,8 +221,8 @@ exports.getProducts=(req, res, next) => {
 }
 
 // Delete product
-exports.postDeleteProduct=(req, res, next) => {
-    const prodId=req.body.productId;
+exports.deleteProduct=(req, res, next) => {
+    const prodId=req.params.productId;
     // req.user.destroy({where: {id: prodId}}) with MySQL
     Product.findById(prodId)
     .then(product=>{
@@ -235,12 +235,10 @@ exports.postDeleteProduct=(req, res, next) => {
     .then(()=>{
 
         console.log('Deleted Product');
-        res.redirect('/admin/products');
+        res.status(200).json({message: 'Success!'});
     })
     .catch(err=>{
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
+        res.status(500).json({message: 'Deleting product failed!'});
     });
     
 }
