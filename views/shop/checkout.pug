@@ -1,1 +1,36 @@
 extends ../layouts/main-layout.pug
+block style
+	link(rel="stylesheet", href="/css/cart.css")
+
+block content
+	main.checkout-container
+		h1.checkout-title Checkout
+
+		if products.length > 0
+			ul.checkout-list
+				each product in products
+					li.checkout-item
+						span.checkout-item__name #{product.productId.title || 'No Title'}
+						span.checkout-item__quantity x#{product.quantity || 0}
+
+			div.checkout-total
+				span.checkout-total__label Total
+				span.checkout-total__price $#{totalSum.toFixed(2)}
+			div.order
+				button.btn(type='button', id='order-btn') Order Now
+				script(src="https://js.stripe.com/v3/")
+				script.
+					var orderBtn = document.getElementById('order-btn');
+					var stripe = Stripe('pk_test_51U9F9BLBgXV09tM5hlv089kPdWkHvVlzbBlMVdduvDsFl6XKHNgFeET1hQNksQ1jO1gUxY59rBYfdbG1N4n51Bbr00VGhCqfQi');
+
+					orderBtn.addEventListener('click', function() {
+						stripe.redirectToCheckout({
+							sessionId: '#{sessionId}'
+						}).then(function (result) {
+							if (result.error) {
+								alert(result.error.message);
+							}
+						});
+					});
+		else
+			p.checkout-empty Your cart is empty.

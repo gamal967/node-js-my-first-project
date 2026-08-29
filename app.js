@@ -16,7 +16,7 @@ const csrf =require('csurf');
 const flash =require('connect-flash');
 const multer =require('multer');
 
-const MONGODB_URI ='mongodb://gamalelctron2332_db_user:gggmmmlll333@ac-0pastqb-shard-00-00.akdhoiv.mongodb.net:27017,ac-0pastqb-shard-00-01.akdhoiv.mongodb.net:27017,ac-0pastqb-shard-00-02.akdhoiv.mongodb.net:27017/shop?ssl=true&replicaSet=atlas-ogso4t-shard-0&authSource=admin&appName=Cluster0'
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const app = express();
 // excute mongodb store constructor

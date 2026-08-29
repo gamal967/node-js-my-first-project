@@ -7,6 +7,7 @@ const { or } = require('sequelize');
 const fs= require('fs');
 const path= require('path');
 const PDF = require('pdfkit');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const ITEM_PER_PAGE = 2;
 
@@ -160,6 +161,53 @@ exports.getDetails=(req, res, next) => {
     });
     
 };
+
+exports.getCheckout=(req, res, next) => {
+    let products;
+    let total=0;
+    req.user
+        .populate('cart.items.productId')
+        .then(user=>{
+            products=user.cart.items;
+            total=0;
+            products.forEach(p=>{
+                total+=p.quantity*p.productId.price
+            })
+            return stripe.checkout.sessions.create({
+                payment_method_types: ['card'],
+                line_items: products.map(p=>{
+                    return {
+                        price_data:{
+                            currency: 'usd',
+                            product_data:{
+                                name: p.productId.title,
+                                description: p.productId.description
+                            },
+                            unit_amount: p.productId.price*100
+                        },
+                        quantity: p.quantity
+                    }
+                }),
+                mode: 'payment',
+                success_url: req.protocol+'://'+req.get('host')+'/checkout/success',
+                cancel_url: req.protocol+'://'+req.get('host')+'/checkout/cancel'
+            });
+        })
+        .then(session=>{
+            res.render('shop/checkout', {
+                docTitle: 'Checkout',
+                path: '/checkout',
+                products: products,
+                totalSum: total,
+                sessionId: session.id
+            });
+        })
+        .catch(err=>{
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
+}
 
 exports.getOrders=(req, res, next) => {
     req.user.fetchOrders()

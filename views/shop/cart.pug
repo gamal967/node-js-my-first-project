@@ -17,9 +17,10 @@ block content
                                 input(type="hidden", name="_csrf", value=csrfToken)
                                 input(type="hidden", name="productId", value=p.productId._id)
                                 button.cart-item__remove(type="submit") Remove
-                form(action="/create-order", method="POST")
-                    input(type="hidden", name="_csrf", value=csrfToken)
-                    button.order(type="submit") Order Now!
+                //- form(action="/create-order", method="POST")
+                //-     input(type="hidden", name="_csrf", value=csrfToken)
+                //-     button.order(type="submit") Order Now!
+                a(href="/checkout").cart-checkout Checkout
 
                 div.cart-total
                     span.cart-total__label Total
