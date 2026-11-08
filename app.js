@@ -98,10 +98,6 @@ app.set('view engine', 'pug');
 app.set('views', path.join(rootDir, 'views'));
 
 
-// Write access logs to stdout in production so they show up in the host's logs.
-const accessLogStream = IS_PRODUCTION
-    ? process.stdout
-    : fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
 //Middlewares
 
 app.use(helmet({
@@ -117,7 +113,10 @@ app.use(helmet({
     }
 }));
 app.use(compression());
-app.use(morgan('combined', { stream: accessLogStream }));
+// Log requests to stdout (Morgan's default stream). Never write an
+// access log file: hosted platforms such as Hostless run the app on a
+// read-only filesystem.
+app.use(morgan('combined'));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
