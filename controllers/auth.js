@@ -192,6 +192,7 @@ exports.postReset = (req, res, next) => {
             return res.redirect('/reset');
         }
         const token =buffer.toString('hex');
+        const appUrl = (process.env.APP_URL || 'http://localhost:3000').replace(/\/+$/, '');
         User.findOne({email: req.body.email})
             .then(user=>{
                 if(!user){
@@ -209,9 +210,9 @@ exports.postReset = (req, res, next) => {
                             subject: 'Password Reset',
                             html: `
                                 <p>You requested a password reset</p>
-                                <p>Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password.</p>
+                                <p>Click this <a href="${appUrl}/reset/${token}">link</a> to set a new password.</p>
                             `
-                        });
+                        }).catch(err => console.error('Password reset email failed:', err));
                     })
                     .catch(err=>console.log(err));
             })
@@ -254,10 +255,18 @@ exports.postNewPassword=(req, res, next) => {
     let resetUser;
     User.findOne({resetToken: passwordToken ,resetTokenExpiration: {$gt : Date.now()}, _id: userId})
         .then(user=>{
+            if(!user){
+                req.flash('error', 'Password reset token is invalid or has expired.');
+                return res.redirect('/reset');
+            }
             resetUser=user;
             return bcrypt.hash(newPassword, 12);
         })
         .then(hashedPassword=>{
+            if(!hashedPassword){
+                // User was not found, response already redirected above.
+                return;
+            }
             resetUser.password=hashedPassword;
             resetUser.resetToken=undefined;
             resetUser.resetTokenExpiration=undefined;

@@ -2,7 +2,7 @@ require('dotenv').config({ quiet: true });
 
 // Fail fast with a clear message when a required variable is missing
 // (instead of crashing later inside Stripe / the session store).
-const REQUIRED_ENV = ['MONGODB_URI', 'STRIPE_SECRET_KEY', 'SESSION_SECRET'];
+const REQUIRED_ENV = ['MONGODB_URI', 'STRIPE_SECRET_KEY', 'STRIPE_PUBLISHABLE_KEY', 'SESSION_SECRET', 'APP_URL'];
 const missingEnv = REQUIRED_ENV.filter(key => !process.env[key]);
 if (missingEnv.length > 0) {
     console.error('Missing required environment variables: ' + missingEnv.join(', '));
@@ -92,7 +92,18 @@ const accessLogStream = IS_PRODUCTION
     : fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
 //Middlewares
 
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            // Stripe Checkout needs its script, iframe and API.
+            'script-src': ["'self'", 'https://js.stripe.com'],
+            'frame-src': ["'self'", 'https://js.stripe.com', 'https://hooks.stripe.com'],
+            'connect-src': ["'self'", 'https://api.stripe.com'],
+            'img-src': ["'self'", 'data:', 'https://*.stripe.com']
+        }
+    }
+}));
 app.use(compression());
 app.use(morgan('combined', { stream: accessLogStream }));
 

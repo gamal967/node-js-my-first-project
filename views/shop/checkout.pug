@@ -17,20 +17,13 @@ block content
 				span.checkout-total__label Total
 				span.checkout-total__price $#{totalSum.toFixed(2)}
 			div.order
-				button.btn(type='button', id='order-btn') Order Now
+				button.btn(
+					type='button'
+					, id='order-btn'
+					, data-session-id=sessionId
+					, data-publishable-key=publishableKey
+				) Order Now
 				script(src="https://js.stripe.com/v3/")
-				script.
-					var orderBtn = document.getElementById('order-btn');
-					var stripe = Stripe('pk_test_51U9F9BLBgXV09tM5hlv089kPdWkHvVlzbBlMVdduvDsFl6XKHNgFeET1hQNksQ1jO1gUxY59rBYfdbG1N4n51Bbr00VGhCqfQi');
-
-					orderBtn.addEventListener('click', function() {
-						stripe.redirectToCheckout({
-							sessionId: '#{sessionId}'
-						}).then(function (result) {
-							if (result.error) {
-								alert(result.error.message);
-							}
-						});
-					});
+				script(src="/js/checkout.js")
 		else
 			p.checkout-empty Your cart is empty.
