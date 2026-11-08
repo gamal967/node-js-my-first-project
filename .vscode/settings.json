@@ -1,3 +1,7 @@
 {
-    "git.followTagsWhenSync": true
+    "git.followTagsWhenSync": true,
+    "editor.formatOnSave": true,
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    }
 }

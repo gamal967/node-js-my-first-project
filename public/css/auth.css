@@ -1,5 +1,5 @@
 .auth-page { min-height: calc(100vh - 64px); }
-.auth-card { width: min(100%, 430px); padding: clamp(1.5rem, 5vw, 2.25rem); border: 1px solid var(--border); border-radius: 1rem; background: var(--surface); box-shadow: var(--shadow); }
+.auth-card { width: min(100%, 430px); padding: clamp(1.5rem, 5vw, 2.25rem); border: 1px solid var(--border); border-radius: 1rem; background: #acdea4; box-shadow: var(--shadow); }
 .auth-card__header { margin-bottom: 1.5rem; text-align: center; }
 .auth-card__title { margin: 0; color: var(--green-900); font: 700 2rem 'Playfair Display', serif; }
 .auth-card__subtitle, .auth-message, .auth-card__footer { color: var(--muted); }
@@ -7,7 +7,7 @@
 .auth-form { display: grid; gap: 1rem; }
 .form-group { display: grid; gap: .4rem; }
 .form-group label { color: var(--green-900); font-weight: 700; }
-.form-group input { width: 100%; padding: .75rem .85rem; border: 1px solid #c5ddca; border-radius: .55rem; background: #fbfefb; color: var(--ink); }
+.form-group input { width: 100%; padding: .75rem .85rem; border: 1px solid #c5ddca; border-radius: .55rem; background: #cfe9c9; color: var(--ink); }
 .form-group input:focus { border-color: var(--green-500); box-shadow: 0 0 0 3px rgba(105, 169, 121, .18); outline: 0; }
 .form-group input.invalid { border-color: var(--danger); }
 .forgot-password, .auth-link, .auth-card__footer a { color: var(--green-800); font-weight: 700; text-decoration: none; }

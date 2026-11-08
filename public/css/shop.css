@@ -1,7 +1,7 @@
 main:not(.main-content) { width: min(1120px, 100%); min-height: calc(100vh - 64px); margin: 0 auto; padding: clamp(1.5rem, 4vw, 3rem) 1rem; }
 main > h1 { color: var(--green-800); font: 700 1.7rem 'Playfair Display', serif; text-align: center; }
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 250px)); justify-content: center; gap: 1.1rem; }
-article.product-item { position: relative; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); border-radius: .9rem; background: var(--surface); box-shadow: 0 5px 16px rgba(29, 85, 53, .07); transition: transform .2s ease, box-shadow .2s ease; }
+article.product-item { position: relative; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); border-radius: .9rem; background: #dbffe7; box-shadow: 0 5px 16px rgba(29, 85, 53, .07); transition: transform .2s ease, box-shadow .2s ease; }
 article.product-item:hover { box-shadow: var(--shadow); transform: translateY(-3px); }
 article.product-item::before { content: ''; position: absolute; inset: 0 0 auto; height: 3px; background: var(--green-300); }
 .card__header { padding: .9rem 1rem .55rem; border-bottom: 1px solid var(--green-100); }

@@ -38,9 +38,9 @@ button, input, textarea { font: inherit; }
 .btn:active, .submit:active { transform: translateY(0); }
 .btn:focus-visible, .submit:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid rgba(105, 169, 121, .45); outline-offset: 2px; }
 
-.product-form { display: grid; gap: .65rem; width: min(100%, 540px); padding: clamp(1.25rem, 4vw, 2rem); border: 1px solid var(--border); border-radius: 1rem; background: var(--surface); box-shadow: var(--shadow); }
+.product-form { display: grid; gap: .65rem; width: min(100%, 540px); padding: clamp(1.25rem, 4vw, 2rem); border: 1px solid var(--border); border-radius: 1rem; background: #acdea4; box-shadow: var(--shadow); }
 .product-form label { margin-top: .35rem; color: var(--green-900); font-weight: 700; }
-.input { width: 100%; padding: .75rem .85rem; border: 1px solid #c5ddca; border-radius: .55rem; background: #fbfefb; color: var(--ink); transition: border-color .2s ease, box-shadow .2s ease; }
+.input { width: 100%; padding: .75rem .85rem; border: 1px solid #c5ddca; border-radius: .55rem; background: #cfe9c9; color: var(--ink); transition: border-color .2s ease, box-shadow .2s ease; }
 .input:focus { border-color: var(--green-500); box-shadow: 0 0 0 3px rgba(105, 169, 121, .18); outline: 0; }
 textarea.input { min-height: 7rem; resize: vertical; }
 .input.invalid { border-color: var(--danger); }
