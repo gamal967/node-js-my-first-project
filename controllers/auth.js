@@ -20,7 +20,6 @@ exports.getLogin = (req, res, next) => {
     //     .get('Cookie')
     //     .trim()
     //     .split('=')[1]==='true';
-    console.log(req.session.isloggedIn);
     res.render('auth/login', {
         docTitle: 'Login',
         path: '/login',

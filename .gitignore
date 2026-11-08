@@ -1,6 +1,20 @@
 node_modules/
+
+# Local secrets / config
 .env
 .env.*
 !.env.example
 .evn
-mongodb-compass_1.49.7_amd64.deb
+nodemon.json
+server.key
+server.key.pem
+server.cert
+server.cert.pem
+
+# Runtime output
+access.log
+data/invoices/
+
+# Local binaries
+*.deb
+*.AppImage

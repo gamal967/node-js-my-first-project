@@ -3,7 +3,6 @@
 const Product = require('../models/product');
 const User = require('../models/user');
 const Order = require('../models/order');
-const { or } = require('sequelize');
 const fs= require('fs');
 const path= require('path');
 const PDF = require('pdfkit');

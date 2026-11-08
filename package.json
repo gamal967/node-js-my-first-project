@@ -1,47 +1,42 @@
 {
   "name": "frist-app",
   "version": "1.0.0",
+  "private": true,
   "description": "node.js project",
   "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js",
-    "start-server": "node server.js"
+  "engines": {
+    "node": "24.x"
   },
-  "nodemonConfig": {
-    "ignore": [
-      "data/*.json"
-    ]
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "echo \"No tests configured\" && exit 0"
   },
   "author": "Gamal",
   "license": "ISC",
   "devDependencies": {
-    "@types/express": "^4.17.21",
-    "@types/node": "^25.6.0",
-    "@types/sequelize": "^4.28.20",
     "nodemon": "^3.1.11"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "body-parser": "^2.2.2",
+    "compression": "^1.8.2",
     "connect-flash": "^0.1.1",
     "connect-mongodb-session": "^5.0.0",
     "csurf": "^1.11.0",
     "dotenv": "^17.4.2",
-    "ejs": "^4.0.1",
     "express": "^5.2.1",
-    "express-handlebars": "3.0",
     "express-session": "^1.19.0",
     "express-validator": "^7.3.2",
+    "helmet": "^8.3.0",
     "mongodb": "^7.2.0",
     "mongoose": "^9.7.2",
+    "morgan": "^1.12.1",
     "multer": "^2.2.0",
-    "mysql2": "^3.22.1",
     "nodemailer": "^9.0.3",
     "nodemailer-sendgrid-transport": "^0.2.0",
     "pdfkit": "^0.19.1",
     "pug": "^3.0.3",
-    "sequelize": "^6.37.8",
     "stripe": "^22.6.0"
   }
 }

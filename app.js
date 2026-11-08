@@ -1,41 +1,77 @@
+require('dotenv').config({ quiet: true });
 
-require('dotenv').config();
-const rootDir =require('./util/path');
-const path =require('path');
-const express =require('express');
-const bodyParser =require('body-parser');   
-const errorController=require('./controllers/error');
-const adminRoutes =require('./routes/admin'); 
-const shopRoute =require('./routes/shop');  
-const authRoutes =require('./routes/auth');  
-const User =require('./models/user');
-const mongoose= require('mongoose');
-const session =require('express-session');
-const MongoDBStore =require('connect-mongodb-session')(session);
-const csrf =require('csurf');
-const flash =require('connect-flash');
-const multer =require('multer');
+// Fail fast with a clear message when a required variable is missing
+// (instead of crashing later inside Stripe / the session store).
+const REQUIRED_ENV = ['MONGODB_URI', 'STRIPE_SECRET_KEY', 'SESSION_SECRET'];
+const missingEnv = REQUIRED_ENV.filter(key => !process.env[key]);
+if (missingEnv.length > 0) {
+    console.error('Missing required environment variables: ' + missingEnv.join(', '));
+    console.error('Set them in your hosting dashboard (Render -> Environment) or in a local .env file.');
+    process.exit(1);
+}
+
+const rootDir = require('./util/path');
+const path = require('path');
+const fs = require('fs');
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const errorController = require('./controllers/error');
+const adminRoutes = require('./routes/admin');
+const shopRoute = require('./routes/shop');
+const authRoutes = require('./routes/auth');
+const User = require('./models/user');
+const mongoose = require('mongoose');
+const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
+const csrf = require('csurf');
+const flash = require('connect-flash');
+const multer = require('multer');
+const helmet = require('helmet');
+const compression = require('compression');
+const morgan = require('morgan');
 
 const MONGODB_URI = process.env.MONGODB_URI;
+const SESSION_SECRET = process.env.SESSION_SECRET;
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 const app = express();
+
+// Render (and most hosts) sit behind a reverse proxy.
+app.set('trust proxy', 1);
+
 // excute mongodb store constructor
+// The callback is required: without it the library throws an unhandled
+// rejection when the database is unreachable, hiding the real error.
 const store = new MongoDBStore({
     uri: MONGODB_URI,
     collection: 'sessions'
-})
+}, err => {
+    if (err) {
+        console.error('Session store connection failed:', err);
+        process.exit(1);
+    }
+});
+store.on('error', err => console.error('Session store error:', err));
+
+// Uploads are stored outside the repo when UPLOAD_DIR is set
+// (use it with a Render persistent disk, e.g. /var/data/images).
+const uploadDir = process.env.UPLOAD_DIR || path.join(rootDir, 'images');
+fs.mkdirSync(uploadDir, { recursive: true });
+
 
 const fileStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'images');
+        cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-        cb(null, new Date().toISOString() + '-' + file.originalname);
+        const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
+        cb(null, new Date().toISOString() + '-' + safeName);
     }
 });
 
 const fileFilter = (req, file, cb) => {
-    if(
+    if (
         file.mimetype === 'image/png' ||
         file.mimetype === 'image/jpg' ||
         file.mimetype === 'image/jpeg'
@@ -46,25 +82,39 @@ const fileFilter = (req, file, cb) => {
     }
 }
 
-app.set('view engine','pug');
-app.set('views','views');
+app.set('view engine', 'pug');
+app.set('views', path.join(rootDir, 'views'));
 
 
+// Write access logs to stdout in production so they show up in Render's logs.
+const accessLogStream = IS_PRODUCTION
+    ? process.stdout
+    : fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
 //Middlewares
-app.use(bodyParser.urlencoded({extended:false}));
 
-app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('image'));
+app.use(helmet());
+app.use(compression());
+app.use(morgan('combined', { stream: accessLogStream }));
 
-app.use(express.static(path.join(rootDir,'public')));
-app.use('/images',express.static(path.join(rootDir,'images')));
+app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));
+
+app.use(express.static(path.join(rootDir, 'public')));
+app.use('/images', express.static(uploadDir));
 
 app.use(
     session({
-        secret: 'my secret key',
+        secret: SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
-        store: store
-}));
+        store: store,
+        cookie: {
+            httpOnly: true,
+            sameSite: 'lax',
+            secure: IS_PRODUCTION
+        }
+    }));
 
 app.use(csrf());
 
@@ -79,6 +129,8 @@ app.use((req, res, next) => {
 })
 
 
+
+
 // //AI{
 // app.use((req, res, next) => {
 //     res.locals.flashMessage = req.session.flashMessage;
@@ -89,57 +141,64 @@ app.use((req, res, next) => {
 
 app.use((req, res, next) => {
     // throw new Error('Error out');
-    if(!req.session.user){
+    if (!req.session.user) {
         return next();
     }
     User.findById(req.session.user._id)
-    .then(user=>{
-        // throw new Error('Error');
-        if(!user){
-            return next();
-        }
+        .then(user => {
+            // throw new Error('Error');
+            if (!user) {
+                return next();
+            }
 
-        req.user = user;
-        next();
-        
-    })
-    .catch(err=>{
-        // throw new Error(err);
-        next(new Error(err)); //the next error is used with async code & thorws error is used with sync
-    });
+            req.user = user;
+            next();
+
+        })
+        .catch(err => {
+            // throw new Error(err);
+            next(new Error(err)); //the next error is used with async code & thorws error is used with sync
+        });
 });
 
 
 
 
 //Routes
-app.use('/admin',adminRoutes);
+app.use('/admin', adminRoutes);
 app.use(shopRoute);
 app.use(authRoutes);
-app.use('/500',errorController.get500);
+app.use('/500', errorController.get500);
 app.use(errorController.get404);
 
+
 app.use((error, req, res, next) => {
-    res.status(500).render('500'
+    console.error(error);
+    if (res.headersSent) {
+        return next(error);
+    }
+    const statusCode = error.httpStatusCode || error.status || error.statusCode || 500;
+    const view = statusCode === 404 ? '404' : '500';
+    res.status(statusCode).render(view
         , {
-            docTitle: 'error 500 '
-            ,path: '/500'
-            ,islogedIn: req.session.islogedIn
+            docTitle: 'error ' + statusCode
+            , path: '/' + statusCode
+            , islogedIn: req.session && req.session.islogedIn
         });
 })
 
 
 mongoose
-    .connect(
-        MONGODB_URI
-    )
+    .connect(MONGODB_URI)
     .then(() => {
-        app.listen(3000);
-        console.log('Connected!');
+        const PORT = process.env.PORT || 3000;
+        app.listen(PORT, '0.0.0.0', () => {
+            console.log('Connected! Server listening on port ' + PORT);
+        });
     })
     .catch(err => {
-        console.log(err);
-});
-
-
-
+        console.error('MongoDB connection failed:', err);
+        // Exit so the host (Render) reports a failed deploy instead of
+        // leaving a process alive that never listens on PORT.
+        process.exit(1);
+    });

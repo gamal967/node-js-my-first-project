@@ -64,7 +64,6 @@ exports.postAddProduct=(req,res,next)=>{
             errorMessage: errors.array()[0].msg,
             oldInputs: {
                 title: title,
-                imageUrl: imageUrl,
                 price: price,
                 description: description
             }
@@ -72,7 +71,9 @@ exports.postAddProduct=(req,res,next)=>{
         });
     }
 
-    const imageUrl=image.path;
+    // Store a path relative to the /images static route, not the disk path,
+    // so it keeps working when UPLOAD_DIR points somewhere else (Render disk).
+    const imageUrl='images/' + image.filename;
 
     const product =new Product({
         // _id: new mongoose.Types.ObjectId('6a42982d0b0bfdf1943ed722'),
@@ -159,7 +160,6 @@ exports.postEditProduct=(req, res, next) => {
             errorMessage: errors.array()[0].msg,
             oldInputs: {
                 title: updatedTitle,
-                imageUrl: updatedImageUrl,
                 price: updatedPrice,
                 description: updatedDescription
             }
@@ -180,7 +180,7 @@ exports.postEditProduct=(req, res, next) => {
             product.description=updatedDescription;
             if(image){
                 fileHelper.deleteFile(product.imageUrl);
-                product.imageUrl=image.path;
+                product.imageUrl='images/' + image.filename;
             }
             return product.save()
             .then(()=>{
