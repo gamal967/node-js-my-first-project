@@ -6,13 +6,14 @@ const REQUIRED_ENV = ['MONGODB_URI', 'STRIPE_SECRET_KEY', 'STRIPE_PUBLISHABLE_KE
 const missingEnv = REQUIRED_ENV.filter(key => !process.env[key]);
 if (missingEnv.length > 0) {
     console.error('Missing required environment variables: ' + missingEnv.join(', '));
-    console.error('Set them in your hosting dashboard (Render -> Environment) or in a local .env file.');
+    console.error('Set them in your hosting dashboard (Hostless -> Environment) or in a local .env file.');
     process.exit(1);
 }
 
 const rootDir = require('./util/path');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -37,7 +38,7 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 const app = express();
 
-// Render (and most hosts) sit behind a reverse proxy.
+// Hostless, Render and similar hosts sit behind a reverse proxy.
 app.set('trust proxy', 1);
 
 // excute mongodb store constructor
@@ -55,9 +56,20 @@ const store = new MongoDBStore({
 store.on('error', err => console.error('Session store error:', err));
 
 // Uploads are stored outside the repo when UPLOAD_DIR is set
-// (use it with a Render persistent disk, e.g. /var/data/images).
-const uploadDir = process.env.UPLOAD_DIR || path.join(rootDir, 'images');
-fs.mkdirSync(uploadDir, { recursive: true });
+// (use it with a writable volume, e.g. /var/data/images).
+let uploadDir = process.env.UPLOAD_DIR || path.join(rootDir, 'images');
+try {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    // Hostless runs apps with a read-only filesystem. The directory may
+    // already exist in the image, so check that it is really writable.
+    fs.accessSync(uploadDir, fs.constants.W_OK);
+} catch (err) {
+    // Fall back to the writable temp directory so the app still starts and
+    // uploads still work; files stored there do not survive a restart.
+    console.warn('Upload directory "' + uploadDir + '" is not writable (' + err.code + '); using the temp directory instead. Uploads will not persist.');
+    uploadDir = path.join(os.tmpdir(), 'uploads');
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 
 const fileStorage = multer.diskStorage({
@@ -86,7 +98,7 @@ app.set('view engine', 'pug');
 app.set('views', path.join(rootDir, 'views'));
 
 
-// Write access logs to stdout in production so they show up in Render's logs.
+// Write access logs to stdout in production so they show up in the host's logs.
 const accessLogStream = IS_PRODUCTION
     ? process.stdout
     : fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
